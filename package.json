@@ -1,0 +1,29 @@
+{
+  "name": "tms-pms",
+  "description": "Service related to provider management",
+  "version": "1.0.0",
+  "main": "app.js",
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "http": "^0.0.1-security",
+    "knex": "^2.1.0",
+    "nodemon": "^2.0.19",
+    "pg": "^8.7.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YasirRehman122/TMS_PMS.git"
+  },
+  "author": "Syed Usman Ahmed",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YasirRehman122/TMS_PMS/issues"
+  },
+  "homepage": "https://github.com/YasirRehman122/TMS_PMS#readme"
+}
