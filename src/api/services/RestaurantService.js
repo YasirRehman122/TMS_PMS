@@ -26,6 +26,7 @@ class RestaurantService extends BaseService{
                 OWNER_NAME: data.ownerName,
                 OWNER_CNIC: data.ownerCNIC,
                 ORDER_QUEUE_SIZE: data.orderQueueSize,
+                CURRENT_QUEUE_SIZE: data.orderQueueSize,
                 ACTIVE_IND: 1,
                 IS_OPEN: 1,
             }
@@ -103,7 +104,7 @@ class RestaurantService extends BaseService{
             return await restaurantModel.getAllCategories();
         }
         catch(err){
-            throw errr;
+            throw err;
         }
     }
 
@@ -124,7 +125,33 @@ class RestaurantService extends BaseService{
             return await restaurantModel.getItemsByCategories(data.id);
         }
         catch(err){
-            throw errr;
+            throw err;
+        }
+    }
+
+    async getQueueState(data) {
+        try{
+
+            const [paramsValidated, err] = this.restaurantUtils.validateGetQueueStateParams(data);
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            const provider = await this.restaurantUtils.checkRestaurant(data.providerID);
+            if (!provider){
+                console.log("No restaurant found against id: ", data.providerID);
+                throw new Exception(STATUS_CODES.NOT_FOUND, RESPONSE_MESSAGES.NO_PROVIDER_FOUND);
+            }
+
+            const currentQueueSize = await restaurantModel.getQueueState(data.providerID);
+            console.log(currentQueueSize.CURRENT_QUEUE_SIZE);
+            if (currentQueueSize.CURRENT_QUEUE_SIZE != 0)
+                return true;
+            return false;
+
+        }
+        catch(err){
+            throw err;
         }
     }
 }

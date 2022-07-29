@@ -90,6 +90,26 @@ class RestaurantController extends BaseController {
         }
     }
 
+    async getQueueState(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> GET QUEUE STATE API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const isAvailable = await this.restaurantService.getQueueState(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.ITEM_FETCHED, {isQueueAvailable: isAvailable});
+
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
 }
 
 

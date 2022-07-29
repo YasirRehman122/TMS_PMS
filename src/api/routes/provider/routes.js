@@ -7,6 +7,7 @@ const controller = new RestaurantController();
 
 router.post('/restaurant', controller.createRestaurant.bind(controller));
 router.post('/restaurant/menu', controller.createMenu.bind(controller));
+router.get('/restaurant/status', controller.getQueueState.bind(controller));
 router.get('/category', controller.getAllCategories.bind(controller));
 router.get('/category/items', controller.getItemsByCategory.bind(controller));
 

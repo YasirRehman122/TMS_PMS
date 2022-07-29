@@ -13,11 +13,14 @@ const db = require('../../database/dbObject');
 
     const getItemsByCategories = async (id) => db.select().table('MENU_ITEM').where({CATEGORY_ID: id});
 
+    const getQueueState = async (id) => db.select('CURRENT_QUEUE_SIZE').table('PROVIDER_INFO').where({ID: id}).first();
+
     module.exports = {
         createRestaurant,
         createMenu,
         getProvider,
         getAllCategories,
         getCategoryById,
-        getItemsByCategories
+        getItemsByCategories,
+        getQueueState
     }

@@ -47,6 +47,20 @@ class RestaurantUtils extends CommonUtils{
         return [true, null];
     }
 
+    validateGetQueueStateParams(data){
+
+        const requiredParams = ['providerID'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
     async checkRestaurant(id){
 
         const restaurant = await restaurantModel.getProvider(id);
