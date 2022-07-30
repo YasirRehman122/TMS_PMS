@@ -12,8 +12,8 @@
         table.string('DESCRIPTION');
         table.tinyint('IS_AVAILABLE', 1);
         table.tinyint('ACTIVE_IND', 1);
-        table.timestamp('CREATED_AT');
-        table.timestamp('MODIFIED_AT');
+        table.timestamp('CREATED_AT').defaultTo(knex.fn.now());
+        table.timestamp('MODIFIED_AT').defaultTo(knex.fn.now());
     })
 
 };

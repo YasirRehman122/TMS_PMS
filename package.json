@@ -16,14 +16,6 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/YasirRehman122/TMS_PMS.git"
-  },
   "author": "Syed Usman Ahmed",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/YasirRehman122/TMS_PMS/issues"
-  },
-  "homepage": "https://github.com/YasirRehman122/TMS_PMS#readme"
+  "license": "ISC"
 }

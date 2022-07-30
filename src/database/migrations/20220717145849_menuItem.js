@@ -9,8 +9,8 @@
         table.integer('CATEGORY_ID').references('CATEGORY.ID').notNullable();
         table.string('NAME').notNullable();
         table.tinyint('ACTIVE_IND', 1);
-        table.timestamp('CREATED_AT');
-        table.timestamp('MODIFIED_AT');
+        table.timestamp('CREATED_AT').defaultTo(knex.fn.now());
+        table.timestamp('MODIFIED_AT').defaultTo(knex.fn.now());
     })
   
 };

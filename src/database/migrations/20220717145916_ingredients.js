@@ -5,11 +5,11 @@
  exports.up = function(knex) {
 
     return knex.schema.createTable('INGREDIENTS', table =>{
-        table.increments('ID', primaryKey = true);
+        table.increments('ID');
         table.integer('MENU_ITEM_ID').references('MENU_ITEM.ID').notNullable();
         table.string('INGREDIENT_NAME').notNullable();
-        table.timestamp('CREATED_AT');
-        table.timestamp('MODIFIED_AT');
+        table.timestamp('CREATED_AT').defaultTo(knex.fn.now());
+        table.timestamp('MODIFIED_AT').defaultTo(knex.fn.now());
     })
   
 };
