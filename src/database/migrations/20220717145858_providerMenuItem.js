@@ -5,9 +5,9 @@
  exports.up = function(knex) {
   
     return knex.schema.createTable('PROVIDER_MENU_ITEM', table =>{
-        table.increments('ID', primaryKey = true);
+        table.increments('ID');
         table.integer('PROVIDER_ID').references('PROVIDER_INFO.ID').notNullable();
-        table.increments('ITEM_ID').references('MENU_ITEM.ID').notNullable();
+        table.integer('ITEM_ID').references('MENU_ITEM.ID').notNullable();
         table.integer('PRICE').unsigned().notNullable();
         table.string('DESCRIPTION');
         table.tinyint('IS_AVAILABLE', 1);

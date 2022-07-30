@@ -10,6 +10,10 @@ const Helper = {
         }
         return [true, null];
 
+    },
+
+    isEmpty(data){
+        return (data === undefined || data == null || data.length <= 0) ? true : false;
     }
 
 }

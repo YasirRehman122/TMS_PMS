@@ -20,7 +20,7 @@ exports.up = function(knex) {
             table.timestamp('MODIFIED_AT').defaultTo(knex.fn.now());
             table.tinyint('IS_OPEN', 1);
         })
-  
+
 };
 
 /**

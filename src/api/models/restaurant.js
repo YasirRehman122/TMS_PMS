@@ -3,9 +3,23 @@ const db = require('../../database/dbObject');
 
     const createRestaurant = async (restaurantObject) => db('PROVIDER_INFO').insert(restaurantObject).returning('*');
 
+    const updateRestaurant = async (id, restaurantObject) => db('PROVIDER_INFO').where({ID: id}).update(restaurantObject).returning('*');
+
+    const addContact = async (contactObject) => db('CONTACT').insert(contactObject).returning('*');
+
+    const updateContact = async (id, contactObject) => db('CONTACT').where({ID: id}).update(contactObject).returning('*');
+
     const createMenu = async (menuObject) => db('PROVIDER_MENU_ITEM').insert(menuObject).returning('*');
 
+    const updateMenu = async (id, menuObject) => db('PROVIDER_MENU_ITEM').where({ID: id}).update(menuObject).returning('*');
+
+    const getContactById = async (id, contactID) => db.select().table('CONTACT').where({ID: contactID, PROVIDER_ID: id}).first();
+
+    const getContactByValue = async (value) => db.select().table('CONTACT').where({CONTACT_VALUE: value}).first();
+
     const getProvider = async (id) => db.select().table('PROVIDER_INFO').where({ID: id}).first();
+
+    const getMenuItem = async (id, providerItemID) => db.select().table('PROVIDER_MENU_ITEM').where({ID: providerItemID, PROVIDER_ID: id}).first();
 
     const getAllCategories = async() => db.select().table('CATEGORY');
 
@@ -17,8 +31,15 @@ const db = require('../../database/dbObject');
 
     module.exports = {
         createRestaurant,
+        updateRestaurant,
+        addContact,
+        updateContact,
         createMenu,
+        updateMenu,
         getProvider,
+        getContactById,
+        getContactByValue,
+        getMenuItem,
         getAllCategories,
         getCategoryById,
         getItemsByCategories,
