@@ -3,6 +3,7 @@ const env  = require('./env');
 const express = require('express');
 const bodyParser = require('body-parser');
 const indexRouter = require('./api/routes/index');
+const eurekaHelper = require('../src/api/helper/eureka_helper');
 
 const port = process.env.PORT || 4000;
 
@@ -23,6 +24,7 @@ app.use(
     extended: false
   })
 );
+eurekaHelper.registerWithEureka('provider', port);
 
 
 app.use('/', indexRouter);
