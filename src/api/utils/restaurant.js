@@ -75,9 +75,23 @@ class RestaurantUtils extends CommonUtils{
         return [true, null];
     }
 
-    validateAddContactParams(data){
+    validateAddIngredientsParams(data){
 
-        const requiredParams = ['providerID', 'contactType', 'contactValue'];
+        const requiredParams = ['providerID','itemID','ingredients'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+    validateUpdateIngredientParams(data){
+
+        const requiredParams = ['providerID', 'ingredientID'];
 
         const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
 
@@ -119,36 +133,49 @@ class RestaurantUtils extends CommonUtils{
 
     async checkRestaurant(id){
 
+        //gets the provider with the given provider id
         const restaurant = await restaurantModel.getProvider(id);
-
+        //returns false if no restaurant (null or undefined) is returned
         return restaurant ?? false;
     }
 
     async checkContactById(id, contactID){
 
+        //gets the contact with the given provider id and contact id
         const contact = await restaurantModel.getContactById(id, contactID);
-
+        //returns false if no contact (null or undefined) is returned
         return contact ?? false;
     }
 
     async checkContactByValue(value){
 
+        //gets the contact with the given value
         const contact = await restaurantModel.getContactByValue(value);
-
+        //returns false if no contact (null or undefined) is returned
         return contact ?? false;
     }
 
     async checkMenu(providerID, providerItemID){
 
+        //gets the menu item with the given provider id and item id
         const menu = await restaurantModel.getMenuItem(providerID, providerItemID);
-
+        //returns false if no menu item (null or undefined) is returned
         return menu ?? false;
+    }
+
+    async checkIngredient(id){
+
+        //gets the ingredient with the given ingredient id
+        const ingredient = await restaurantModel.getIngredient(id);
+        //returns false if no ingredient (null or undefined) is returned
+        return ingredient ?? false;
     }
 
     async checkCategory(id){
 
+        //gets the category with the given category id
         const category = await restaurantModel.getCategoryById(id);
-
+        //returns false if no category (null or undefined) is returned
         return category ?? false;
     }
 }

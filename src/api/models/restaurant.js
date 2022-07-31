@@ -13,6 +13,12 @@ const db = require('../../database/dbObject');
 
     const updateMenu = async (id, menuObject) => db('PROVIDER_MENU_ITEM').where({ID: id}).update(menuObject).returning('*');
 
+    const addIngredients = async (ingredientsArray) => db('INGREDIENTS').insert(ingredientsArray).returning('*');
+
+    const updateIngredient = async (id, ingredientObject) => db('INGREDIENTS').where({ID: id}).update(ingredientObject).returning('*');
+
+    const getIngredient = async (id) => db.select().table('INGREDIENTS').where({ID: id}).first();
+
     const getContactById = async (id, contactID) => db.select().table('CONTACT').where({ID: contactID, PROVIDER_ID: id}).first();
 
     const getContactByValue = async (value) => db.select().table('CONTACT').where({CONTACT_VALUE: value}).first();
@@ -36,10 +42,13 @@ const db = require('../../database/dbObject');
         updateContact,
         createMenu,
         updateMenu,
+        addIngredients,
+        updateIngredient,
         getProvider,
         getContactById,
         getContactByValue,
         getMenuItem,
+        getIngredient,
         getAllCategories,
         getCategoryById,
         getItemsByCategories,

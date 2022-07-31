@@ -11,6 +11,8 @@ router.post('/restaurant/addContact', controller.addContact.bind(controller));
 router.post('/restaurant/updateContact', controller.updateContact.bind(controller));
 router.post('/restaurant/createMenu', controller.createMenu.bind(controller));
 router.post('/restaurant/updateMenu', controller.updateMenu.bind(controller));
+router.post('/restaurant/menu/addIngredients', controller.addIngredients.bind(controller));
+router.post('/restaurant/menu/updateingredient', controller.updateIngredient.bind(controller));
 router.get('/restaurant/status', controller.getQueueState.bind(controller));
 router.get('/category', controller.getAllCategories.bind(controller));
 router.get('/category/items', controller.getItemsByCategory.bind(controller));

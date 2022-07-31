@@ -115,6 +115,40 @@ class RestaurantController extends BaseController {
         }
     }
 
+    async addIngredients(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> ADD INGREDIENTS API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>>> BODY: ", JSON.stringify(req.body));
+
+            const menu = await this.restaurantService.addIngredients(req.body);
+            
+            res.success(STATUS_CODES.CREATED, RESPONSE_MESSAGE.INGREDINETS_ADDED, menu);
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
+    async updateIngredient(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> UPDATE INGREDIENT API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>>> BODY: ", JSON.stringify(req.body));
+
+            const menu = await this.restaurantService.updateIngredient(req.body);
+            
+            res.success(STATUS_CODES.CREATED, RESPONSE_MESSAGE.INGREDIENT_UPDATED, menu);
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
     async getAllCategories(req, res, next) {
        
         try{
