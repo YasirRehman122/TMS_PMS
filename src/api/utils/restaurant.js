@@ -33,6 +33,35 @@ class RestaurantUtils extends CommonUtils{
         return [true, null];
     }
 
+    validateGetRestaurantParams(data){
+
+        const requiredParams = ['latitude', 'longitude'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+    validateGetMenuParams(data){
+
+        const requiredParams = ['providerID'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+
     validateGetItemsByCategoryParams(data){
 
         const requiredParams = ['id'];
@@ -131,6 +160,48 @@ class RestaurantUtils extends CommonUtils{
         return [true, null];
     }
 
+    validateSaveFeedbackParams1(data){
+
+        const requiredParams = ['providerID', 'userID', 'feedback'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+    validateSaveFeedbackParams2(data){
+
+        const requiredParams = ['itemID', 'rating', 'review'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+    validateGetFeedbackParams(data){
+
+        const requiredParams = ['itemID', 'providerID'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
     async checkRestaurant(id){
 
         //gets the provider with the given provider id
@@ -178,6 +249,24 @@ class RestaurantUtils extends CommonUtils{
         //returns false if no category (null or undefined) is returned
         return category ?? false;
     }
+
+    getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
+        var R = 6371; // Radius of the earth in km
+        var dLat = this.deg2rad(lat2-lat1);  // deg2rad below
+        var dLon = this.deg2rad(lon2-lon1); 
+        var a = 
+          Math.sin(dLat/2) * Math.sin(dLat/2) +
+          Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
+          Math.sin(dLon/2) * Math.sin(dLon/2)
+          ; 
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+        var d = R * c; // Distance in km
+        return d;
+      }
+      
+      deg2rad(deg) {
+        return deg * (Math.PI/180)
+      }
 }
 
 module.exports = RestaurantUtils;

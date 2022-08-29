@@ -9,12 +9,14 @@ const RESPONSE_MESSAGES =  {
     CONTACT_ALREADY_REGISTERED: 'Contact Already Registered',
     MENU_CREATED: 'Menu Created Successfully',
     MENU_UPDATED: 'Menu Updated Successfully',
+    MENU_FOUND: 'Menu Found Successfully',
     INGREDINETS_ADDED: 'Ingredients Added Successfully',
     INGREDIENT_UPDATED: 'Ingredient Updated Successfully',
     LOGIN_SUCCESS: 'Login Successful',
     CATEGORIES_FETCHED: 'Categories fetched successfully',
     ITEM_FETCHED: 'Items fetched successfully',
     PASSWORD_UPDATED: 'Password updated successfuly',
+    RESTAURANTS_FOUND: 'Restaurants Found',
 
 
     // Error messages
@@ -28,7 +30,8 @@ const RESPONSE_MESSAGES =  {
     NO_CONTACT_FOUND: 'No Contact found',
     NO_CATEGORY_FOUND: 'No category found',
     NO_INGREDIENT_FOUND: 'No ingredient found',
-    INVALID_PARAMETERS: 'Could not update given parameters'
+    INVALID_PARAMETERS: 'Could not update given parameters',
+    INVALID_RATING: 'Invalid value for ratings'
 };
 
 module.exports = RESPONSE_MESSAGES;

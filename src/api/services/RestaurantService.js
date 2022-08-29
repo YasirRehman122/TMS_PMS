@@ -5,6 +5,7 @@ const {isEmpty} = require("../helper/helper");
 const restaurantModel = require("../models/restaurant");
 const RESPONSE_MESSAGES = require("../constants/ResponseMessages");
 const STATUS_CODES = require("../constants/StatusCodes");
+const moment = require('moment');
 
 class RestaurantService extends BaseService{
     constructor() {
@@ -101,6 +102,79 @@ class RestaurantService extends BaseService{
         }
 
     }
+
+    async getNearbyRestaurants(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            const [paramsValidated, err] = this.restaurantUtils.validateGetRestaurantParams(data)
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            const restaurants = await restaurantModel.getNearbyRestaurants({lat: data.latitude, lng: data.longitude});
+
+            restaurants.rows.forEach(x => x.DISTANCE = this.restaurantUtils.getDistanceFromLatLonInKm(data.latitude, data.longitude, x.latitude, x.longitude));
+
+            console.log(">>>>>>>>>>>>> RESTAURANT: ", restaurants.rows);
+
+            //updated information is returned as an object
+            return restaurants.rows
+
+        }
+        catch(err){
+            throw err;
+        }
+
+    }
+
+    async getRestaurantMenu(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            const [paramsValidated, err] = this.restaurantUtils.validateGetMenuParams(data)
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            //checks if the restaurant with the given providerID exists
+            const restaurant = await this.restaurantUtils.checkRestaurant(data.providerID);
+            if (!restaurant){
+                console.log("No restaurant found against id: ", data.providerID);
+                throw new Exception(STATUS_CODES.NOT_FOUND, RESPONSE_MESSAGES.NO_PROVIDER_FOUND);
+            }
+
+            const menu = await restaurantModel.getRestaurantMenu(data.providerID);
+
+            for (let x of menu) {
+                const ingredients = await restaurantModel.getMenuIngredient(x.ID);
+                x.INGREDIENTS = ingredients.map(y => y.INGREDIENT_NAME)
+                const categoryAndName = await restaurantModel.getItemName(x.ITEM_ID)
+                x.ITEM_NAME = categoryAndName.NAME;
+                const categoryName = await restaurantModel.getCategoryById(categoryAndName.CATEGORY_ID);
+                x.CATEGORY_NAME = categoryName.NAME;
+                x.CATEGORY_ID = categoryAndName.CATEGORY_ID
+            }
+
+            const property = 'CATEGORY_ID'
+            let menuSorted =  menu.reduce(function(memo, x) {
+                if (!memo[x[property]]) { memo[x[property]] = []; }
+                memo[x[property]].push(x);
+                return memo;
+              }, {});
+
+            console.log(">>>>>>>>>>>>> RESTAURANT: ", menuSorted);
+
+            return menuSorted;
+
+        }
+        catch(err){
+            throw err;
+        }
+
+    }
+
+
 
     async addContact(data) {
         try{
@@ -478,6 +552,92 @@ class RestaurantService extends BaseService{
             if (currentQueueSize.CURRENT_QUEUE_SIZE != 0)
                 return true;
             return false;
+
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    async saveFeedback(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            let [paramsValidated, err] = this.restaurantUtils.validateSaveFeedbackParams1(data);
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            data.feedback.forEach(x => {
+                [paramsValidated, err] = this.restaurantUtils.validateSaveFeedbackParams2(x);
+                if (!paramsValidated){
+                    throw new Exception(STATUS_CODES.BAD_REQUEST, err);
+                }
+
+                if (x.rating < 1 || x.rating > 5) {
+                    throw new Exception(STATUS_CODES.NOT_FOUND, RESPONSE_MESSAGES.INVALID_RATING);
+                }
+
+            })
+
+            const restaurant = await this.restaurantUtils.checkRestaurant(data.providerID);
+            if (!restaurant){
+                console.log("No restaurant found against id: ", data.providerID);
+                throw new Exception(STATUS_CODES.NOT_FOUND, RESPONSE_MESSAGES.NO_PROVIDER_FOUND);
+            }
+
+            const dataToInsert = data.feedback.map(x => ({
+                USER_ID: data.userID,
+                PROVIDER_ID: data.providerID,
+                ITEM_ID: x.itemID,
+                RATING: x.rating,
+                REVIEW: x.review
+            }));
+
+            const feedback = await restaurantModel.saveFeedback(dataToInsert);
+
+            return feedback;
+
+        }
+        catch(err){
+            throw err;
+        }
+    }
+
+    async getFeedback(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            let [paramsValidated, err] = this.restaurantUtils.validateGetFeedbackParams(data);
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            const restaurant = await this.restaurantUtils.checkRestaurant(data.providerID);
+            if (!restaurant){
+                console.log("No restaurant found against id: ", data.providerID);
+                throw new Exception(STATUS_CODES.NOT_FOUND, RESPONSE_MESSAGES.NO_PROVIDER_FOUND);
+            }
+
+            const feedback = await restaurantModel.getFeedback(data.providerID, data.itemID);
+
+            const uniqueIds = [];
+
+            const unique = feedback.filter(element => {
+                const isDuplicate = uniqueIds.includes(element.id);
+
+                if (!isDuplicate) {
+                    uniqueIds.push(element.id);
+
+                    return true;
+                }
+
+                return false;
+            });
+
+            unique.forEach(x => x.CREATED_AT = moment(x.CREATED_AT).format('L'));
+
+            return unique;
 
         }
         catch(err){

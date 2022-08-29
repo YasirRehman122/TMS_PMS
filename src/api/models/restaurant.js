@@ -19,6 +19,8 @@ const db = require('../../database/dbObject');
 
     const getIngredient = async (id) => db.select().table('INGREDIENTS').where({ID: id}).first();
 
+    const getMenuIngredient = async (id) => db.select('INGREDIENT_NAME').table('INGREDIENTS').where({MENU_ITEM_ID: id});
+
     const getContactById = async (id, contactID) => db.select().table('CONTACT').where({ID: contactID, PROVIDER_ID: id}).first();
 
     const getContactByValue = async (value) => db.select().table('CONTACT').where({CONTACT_VALUE: value}).first();
@@ -27,6 +29,8 @@ const db = require('../../database/dbObject');
 
     const getMenuItem = async (id, providerItemID) => db.select().table('PROVIDER_MENU_ITEM').where({ID: providerItemID, PROVIDER_ID: id}).first();
 
+    const getItemName = async (id) => db.select('CATEGORY_ID', 'NAME').table('MENU_ITEM').where({ID: id}).first();
+
     const getAllCategories = async() => db.select().table('CATEGORY');
 
     const getCategoryById = async (id) => db.select().table('CATEGORY').where({ID: id}).first();
@@ -34,6 +38,14 @@ const db = require('../../database/dbObject');
     const getItemsByCategories = async (id) => db.select().table('MENU_ITEM').where({CATEGORY_ID: id});
 
     const getQueueState = async (id) => db.select('CURRENT_QUEUE_SIZE').table('PROVIDER_INFO').where({ID: id}).first();
+
+    const getRestaurantMenu = async (id) => db.select('*').table('PROVIDER_MENU_ITEM').where({PROVIDER_ID: id, IS_AVAILABLE: 1, ACTIVE_IND: 1});
+
+    const getNearbyRestaurants = async (latLng) => db.raw('SELECT * FROM "PROVIDER_INFO" WHERE (acos(sin("LATITUDE" * 0.0175) * sin(:lat * 0.0175) + cos("LATITUDE" * 0.0175) * cos(:lat * 0.0175) *  cos((:lng * 0.0175) - ("LONGITUDE" * 0.0175))) * 6371 <= 5) AND "ACTIVE_IND"=1 AND "IS_OPEN"=1', latLng);
+
+    const saveFeedback = async (feedbackObject) => db('FEEDBACK').insert(feedbackObject).returning('*');
+
+    const getFeedback = async (providerID, itemID) => db.select('*').table('FEEDBACK').where({PROVIDER_ID: providerID,  ITEM_ID: itemID});
 
     module.exports = {
         createRestaurant,
@@ -48,9 +60,15 @@ const db = require('../../database/dbObject');
         getContactById,
         getContactByValue,
         getMenuItem,
+        getItemName,
         getIngredient,
+        getMenuIngredient,
         getAllCategories,
         getCategoryById,
         getItemsByCategories,
-        getQueueState
+        getQueueState,
+        getNearbyRestaurants,
+        getRestaurantMenu,
+        saveFeedback,
+        getFeedback,
     }

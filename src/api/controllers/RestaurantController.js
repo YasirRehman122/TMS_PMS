@@ -210,6 +210,85 @@ class RestaurantController extends BaseController {
         }
     }
 
+    async getNearbyRestaurants(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> GET NEARBY RESTAURANTS API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const restaurants = await this.restaurantService.getNearbyRestaurants(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.RESTAURANTS_FOUND, restaurants);
+
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
+    async getRestaurantMenu(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> GET RESTAURANT MENU API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const menu = await this.restaurantService.getRestaurantMenu(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.MENU_FOUND, menu);
+
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
+    async saveFeedback(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SAVE FEEDBACK API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const feedback = await this.restaurantService.saveFeedback(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.SUCCESS, feedback);
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
+    async getFeedback(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> GET FEEDBACK API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const feedback = await this.restaurantService.getFeedback(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.SUCCESS, feedback);
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
+
 }
 
 

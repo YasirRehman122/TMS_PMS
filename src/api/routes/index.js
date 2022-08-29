@@ -3,6 +3,7 @@ const express = require("express");
 
 // Local Imports
 const providerRoutes = require('./provider/routes');
+const recommenderRoutes = require('./recommender/routes');
 const response = require('../middlewares/Response');
 
 
@@ -10,6 +11,7 @@ const response = require('../middlewares/Response');
 const router = express.Router();
 
 router.use('/provider', response, providerRoutes);
+router.use('/recommender', response, recommenderRoutes);
 
 
 router.get('/', async (_req, res, _next) => {
