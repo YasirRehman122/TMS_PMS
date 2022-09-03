@@ -1,13 +1,14 @@
 const CommonUtils = require("./common");
 const Helper = require('../helper/helper');
 const restaurantModel = require('../models/restaurant');
+const Blob = require('node:buffer');
 
 class RestaurantUtils extends CommonUtils{
     constructor() {super()}
 
     validateCreateRestaurantParams(data){
 
-        const requiredParams = ['shopName', 'licenseNo', 'ownerName', 'orderQueueSize'];
+        const requiredParams = ['shopName', 'licenseNo', 'ownerName', 'orderQueueSize', 'latitude', 'longitude'];
 
         const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
 
@@ -36,6 +37,20 @@ class RestaurantUtils extends CommonUtils{
     validateGetRestaurantParams(data){
 
         const requiredParams = ['latitude', 'longitude'];
+
+        const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
+
+        if (!paramsPresent && err){
+            console.log(`Missing required parameter ${err}`);
+            return [false, `Missing required parameter ${err}`];
+        }
+
+        return [true, null];
+    }
+
+    validateGetProvidersParams(data){
+
+        const requiredParams = ['ids'];
 
         const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
 
@@ -78,7 +93,7 @@ class RestaurantUtils extends CommonUtils{
 
     validateCreateMenuParams(data){
 
-        const requiredParams = ['providerID','itemID','price','description'];
+        const requiredParams = ['providerID','itemID','price','description', 'image', 'imageType'];
 
         const [paramsPresent, err] = Helper.paramsPresent(requiredParams, data);
 
@@ -205,7 +220,7 @@ class RestaurantUtils extends CommonUtils{
     async checkRestaurant(id){
 
         //gets the provider with the given provider id
-        const restaurant = await restaurantModel.getProvider(id);
+        const restaurant = await restaurantModel.getProvider([id]);
         //returns false if no restaurant (null or undefined) is returned
         return restaurant ?? false;
     }

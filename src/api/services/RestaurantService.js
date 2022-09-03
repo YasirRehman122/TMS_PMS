@@ -6,6 +6,7 @@ const restaurantModel = require("../models/restaurant");
 const RESPONSE_MESSAGES = require("../constants/ResponseMessages");
 const STATUS_CODES = require("../constants/StatusCodes");
 const moment = require('moment');
+const axios = require('axios')
 
 class RestaurantService extends BaseService{
     constructor() {
@@ -32,6 +33,10 @@ class RestaurantService extends BaseService{
                 CURRENT_QUEUE_SIZE: data.orderQueueSize,
                 ACTIVE_IND: 1,
                 IS_OPEN: 1,
+                LATITUDE: data.latitude,
+                LONGITUDW: data.longitude,
+                IMAGE: Buffer.from(data.image, 'base64'),
+                IMAGE_TYPE: data.imageType
             }
 
             console.log(">>>>>>>>>>>> Inserting user in Database", restaurantObject)
@@ -77,6 +82,10 @@ class RestaurantService extends BaseService{
             if (!isEmpty(data.acceptVoucher)) restaurantObject.ACCEPT_VOUCHER = data.acceptVoucher;
             if (!isEmpty(data.orderQueueSize)) restaurantObject.ORDER_QUEUE_SIZE = data.orderQueueSize;
             if (!isEmpty(data.isOpen)) restaurantObject.IS_OPEN = data.isOpen;
+            if (!isEmpty(data.latitude)) restaurantObject.LATITUDE = data.latitude;
+            if (!isEmpty(data.longitude)) restaurantObject.LONGITUDE = data.longitude;
+            if (!isEmpty(data.image)) restaurantObject.IMAGE = Buffer.from(data.image, 'base64');
+            if (!isEmpty(data.imageType)) restaurantObject.IMAGE_TYPE = data.imageType;
 
 
             //checks if the restaurantObject has any property
@@ -114,12 +123,35 @@ class RestaurantService extends BaseService{
 
             const restaurants = await restaurantModel.getNearbyRestaurants({lat: data.latitude, lng: data.longitude});
 
-            restaurants.rows.forEach(x => x.DISTANCE = this.restaurantUtils.getDistanceFromLatLonInKm(data.latitude, data.longitude, x.latitude, x.longitude));
+            restaurants.rows.forEach(x => {
+                x.DISTANCE = this.restaurantUtils.getDistanceFromLatLonInKm(data.latitude, data.longitude, x.latitude, x.longitude);
+                if (x.IMAGE) x.IMAGE = Buffer.from(x.IMAGE, 'binary').toString('base64');
+            });
 
             console.log(">>>>>>>>>>>>> RESTAURANT: ", restaurants.rows);
 
             //updated information is returned as an object
             return restaurants.rows
+
+        }
+        catch(err){
+            throw err;
+        }
+
+    }
+
+    async getProviders(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            const [paramsValidated, err] = this.restaurantUtils.validateGetProvidersParams(data)
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            const restaurants = await restaurantModel.getProvider(data.ids);
+
+            return restaurants
 
         }
         catch(err){
@@ -148,15 +180,18 @@ class RestaurantService extends BaseService{
 
             for (let x of menu) {
                 const ingredients = await restaurantModel.getMenuIngredient(x.ID);
-                x.INGREDIENTS = ingredients.map(y => y.INGREDIENT_NAME)
+                x.INGREDIENTS = ingredients.filter(y => y.IS_OPTIONAL === 0).map(z => z.INGREDIENT_NAME);
+                x.OPTIONALL_INGREDIENTS = ingredients.filter(y => y.IS_OPTIONAL === 1).map(z => z.INGREDIENT_NAME);
                 const categoryAndName = await restaurantModel.getItemName(x.ITEM_ID)
                 x.ITEM_NAME = categoryAndName.NAME;
                 const categoryName = await restaurantModel.getCategoryById(categoryAndName.CATEGORY_ID);
                 x.CATEGORY_NAME = categoryName.NAME;
-                x.CATEGORY_ID = categoryAndName.CATEGORY_ID
+                x.CATEGORY_ID = categoryAndName.CATEGORY_ID;
+
+                if (x.IMAGE) x.IMAGE = Buffer.from(x.IMAGE, 'binary').toString('base64');
             }
 
-            const property = 'CATEGORY_ID'
+            const property = 'CATEGORY_NAME'
             let menuSorted =  menu.reduce(function(memo, x) {
                 if (!memo[x[property]]) { memo[x[property]] = []; }
                 memo[x[property]].push(x);
@@ -314,6 +349,8 @@ class RestaurantService extends BaseService{
                     DESCRIPTION: x.description,
                     ACTIVE_IND: 1,
                     IS_AVAILABLE: 1,
+                    IMAGE: Buffer.from(x.image, 'base64'),
+                    IMAGE_TYPE: x.imageType
                 }
 
                 console.log(">>>>>>>>>>>> Inserting menu in Database", menuObject);
@@ -365,6 +402,8 @@ class RestaurantService extends BaseService{
             if (!isEmpty(data.price)) menuObject.PRICE = data.price;
             if (!isEmpty(data.description)) menuObject.DESCRIPTION = data.description;
             if (!isEmpty(data.isAvailable)) menuObject.IS_AVAILABLE = data.isAvailable;
+            if (!isEmpty(data.image)) menuObject.IMAGE = Buffer.from(data.image, 'base64');
+            if (!isEmpty(data.imageType)) menuObject.IMAGE_TYPE = data.isAvailable;
 
             //checks if the menuObject has any property
             //If menuObject is empty, either no or invalid optional parameters are passed
@@ -498,7 +537,10 @@ class RestaurantService extends BaseService{
     async getAllCategories() {
         try{
             //fetching and returning all the different food categories that the platform supports
-            return await restaurantModel.getAllCategories();
+            categories = await restaurantModel.getAllCategories();
+            categories.forEach(x => {
+                if (x.IMAGE) x.IMAGE = Buffer.from(x.IMAGE, 'binary').toString('base64');
+            });
         }
         catch(err){
             throw err;
@@ -549,8 +591,10 @@ class RestaurantService extends BaseService{
             const currentQueueSize = await restaurantModel.getQueueState(data.providerID);
 
             //returning if the queue has space or is full
-            if (currentQueueSize.CURRENT_QUEUE_SIZE != 0)
+            if (currentQueueSize.CURRENT_QUEUE_SIZE != 0) {
+                restaurantModel.updateRestaurant(data.provider, {CURRENT_QUEUE_SIZE: currentQueueSize.CURRENT_QUEUE_SIZE - 1});
                 return true;
+            }
             return false;
 
         }
@@ -620,6 +664,7 @@ class RestaurantService extends BaseService{
             }
 
             const feedback = await restaurantModel.getFeedback(data.providerID, data.itemID);
+            console.log(feedback);
 
             const uniqueIds = [];
 
@@ -635,10 +680,20 @@ class RestaurantService extends BaseService{
                 return false;
             });
 
-            unique.forEach(x => x.CREATED_AT = moment(x.CREATED_AT).format('L'));
+            const ids = unique.map(x => x.USER_ID);
+
+            const URL = 'https://api-identity-management.herokuapp.com/customer/get-users';
+
+            const axiosResponse = await axios.post(URL, {ids});
+            const responseObject = axiosResponse.data;
+
+            
+            unique.forEach(x => {
+                x.USER = responseObject.data.filter(y => x.USER_ID === y.ID)[0];
+                x.CREATED_AT = moment(x.CREATED_AT).format('L')
+            });
 
             return unique;
-
         }
         catch(err){
             throw err;

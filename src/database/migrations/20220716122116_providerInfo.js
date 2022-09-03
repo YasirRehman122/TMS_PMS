@@ -14,7 +14,7 @@ exports.up = function(knex) {
             table.tinyint('ACCEPT_VOUCHER', 1);
             table.integer('ORDER_QUEUE_SIZE');
             table.integer('CURRENT_QUEUE_SIZE');
-            table.integer('AVG_RATING');
+            table.float('AVG_RATING');
             table.tinyint('ACTIVE_IND', 1);
             table.timestamp('CREATED_AT').defaultTo(knex.fn.now());
             table.timestamp('MODIFIED_AT').defaultTo(knex.fn.now());

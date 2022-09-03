@@ -25,7 +25,7 @@ const db = require('../../database/dbObject');
 
     const getContactByValue = async (value) => db.select().table('CONTACT').where({CONTACT_VALUE: value}).first();
 
-    const getProvider = async (id) => db.select().table('PROVIDER_INFO').where({ID: id}).first();
+    const getProvider = async (ids) => db.select().table('PROVIDER_INFO').whereIn('ID', ids);
 
     const getMenuItem = async (id, providerItemID) => db.select().table('PROVIDER_MENU_ITEM').where({ID: providerItemID, PROVIDER_ID: id}).first();
 
