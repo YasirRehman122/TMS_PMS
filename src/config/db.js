@@ -21,6 +21,7 @@ module.exports = {
         "database": knexConfig.production.connection.database,
         "host": knexConfig.production.connection.host,
         "dialect": knexConfig.production.client,
+        "ssl": knexConfig.production.ssl
     }
   }
   
