@@ -16,10 +16,10 @@ router.post('/restaurant/menu/updateingredient', controller.updateIngredient.bin
 router.post('/getNearbyRestaurants', controller.getNearbyRestaurants.bind(controller));
 router.post('/saveFeedback', controller.saveFeedback.bind(controller))
 router.post('/getFeedback', controller.getFeedback.bind(controller))
-router.get('/getRestaurantMenu', controller.getRestaurantMenu.bind(controller));
-router.get('/restaurant/status', controller.getQueueState.bind(controller));
+router.post('/getRestaurantMenu', controller.getRestaurantMenu.bind(controller));
+router.post('/restaurant/status', controller.getQueueState.bind(controller));
 router.get('/category', controller.getAllCategories.bind(controller));
-router.get('/category/items', controller.getItemsByCategory.bind(controller));
+router.post('/category/items', controller.getItemsByCategory.bind(controller));
 
 
 module.exports = router
