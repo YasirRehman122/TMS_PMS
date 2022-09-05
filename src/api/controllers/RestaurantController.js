@@ -230,6 +230,26 @@ class RestaurantController extends BaseController {
         }
     }
 
+    async getBestSellingRestaurants(req, res, next) {
+
+        try{
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> GET BEST SELLING RESTAURANTS API <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            console.log(">>>>> BODY: ", JSON.stringify(req.body));
+
+            const restaurants = await this.restaurantService.getBestSellingRestaurants(req.body);
+
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>> SUCCESSFUl <<<<<<<<<<<<<<<<<<<<<<<<<");
+
+            res.success(STATUS_CODES.SUCCESS, RESPONSE_MESSAGE.RESTAURANTS_FOUND, restaurants);
+
+        }
+        catch (err){
+            console.log(err);
+            this.handleExceptions(err, res);
+        }
+    }
+
     async getProviders(req, res, next) {
 
         try{

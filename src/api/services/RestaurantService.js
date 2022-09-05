@@ -140,6 +140,41 @@ class RestaurantService extends BaseService{
 
     }
 
+    async getBestSellingRestaurants(data) {
+        try{
+
+            //checks if the request body contains all the required parameters
+            const [paramsValidated, err] = this.restaurantUtils.validateGetRestaurantParams(data)
+            if (!paramsValidated){
+                throw new Exception(STATUS_CODES.BAD_REQUEST, err)
+            }
+
+            const URL = 'http://localhost:8080/tms/oms/order/getProviderIds';
+
+            const axiosResponse = await axios.post(URL);
+            const responseObject = axiosResponse.data;
+
+            const restaurants = await restaurantModel.getNearbyRestaurants({lat: data.latitude, lng: data.longitude});
+
+            restaurants = restaurants.filter(item => responseObject.indexOf(item.id) !== -1);
+
+            restaurants.rows.forEach(x => {
+                x.DISTANCE = this.restaurantUtils.getDistanceFromLatLonInKm(data.latitude, data.longitude, x.latitude, x.longitude);
+                if (x.IMAGE) x.IMAGE = Buffer.from(x.IMAGE, 'binary').toString('base64');
+            });
+
+            console.log(">>>>>>>>>>>>> RESTAURANT: ", restaurants.rows);
+
+            //updated information is returned as an object
+            return restaurants.rows
+
+        }
+        catch(err){
+            throw err;
+        }
+
+    }
+
     async getProviders(data) {
         try{
 
