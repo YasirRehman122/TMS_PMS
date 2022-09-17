@@ -1,0 +1,18 @@
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.up = function(knex) {
+    return knex.schema.table('PROVIDER_INFO', table =>{
+        table.string('ADDRESS');
+    })
+
+};
+
+/**
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
+ */
+exports.down = function(knex) {
+  
+};
